@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66388f5e6c92554d962799678eb3caf, type: 3}
+  m_Name: defautStats
+  m_EditorClassIdentifier: Assembly-CSharp::MovementStats
+  maxSpeed: 6
+  acceleration: 30
+  accelerationFactorFromDot: 1
+  maxAccelForce: 40
+  maxAccelerationForceFactorFromDot: 1
+  forceScale: 1
+  gravityScaleDrop: 2
+  jumpUpVel: 8
+  jumpUpVelFactorFromExistingY: 1
+  analogJumpUpForce: 1
+  jumpTerminalVelocity: -20
+  jumpDuration: 0.2
+  coyoteTimeThreshold: 0.15
+  autoJumpAfterLandThreshold: 0.1
+  jumpFallFactor: 1.5
+  jumpSkipGroundCheckDuration: 0.05
+  landingContextThreshold: -10
+  minLandingContextDuration: 0.2
