@@ -1,17 +1,36 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerLocomotion : MonoBehaviour
 {
     PlayerInputReader input;
+    PlayerGroundCheck ground;
     MovementStats stats;
-    CharacterController controller;
+    Rigidbody rb;
 
-    Vector3 velocity;
+    [SerializeField] private float rotationSpeed = 15f; 
+    [SerializeField] private bool inverseCameraMovement = false;
+    
+    // NEW: Reference to the camera so we know which way we are looking
+    [SerializeField] private Transform mainCamera;
 
     void Awake()
     {
         input = GetComponent<PlayerInputReader>();
-        controller = GetComponent<CharacterController>();
+        ground = GetComponent<PlayerGroundCheck>();
+        rb = GetComponent<Rigidbody>();
+        
+        rb.useGravity = false;
+        rb.freezeRotation = true;
+    }
+
+    void Start()
+    {
+        // If you didn't assign a camera in the inspector, grab the default Main Camera
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main.transform;
+        }
     }
 
     public void Initialize(MovementStats s)
@@ -19,37 +38,74 @@ public class PlayerLocomotion : MonoBehaviour
         stats = s;
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        Vector3 moveDir = new Vector3(input.MoveInput.x, 0, input.MoveInput.y);
+        HandleHover();
+        
+        // Calculate our camera-relative input exactly once per frame
+        Vector3 moveDir = GetCameraRelativeMoveDirection();
+        
+        // Pass it to both methods
+        HandleMovement(moveDir);
 
-        if (moveDir.magnitude > 1)
-            moveDir.Normalize();
+        if (!inverseCameraMovement)
+        {
+            moveDir = -moveDir;
+        }
+        //HandleRotation(moveDir); 
+    }
 
+    // NEW METHOD: Converts raw input into camera-relative direction
+    // private Vector3 GetCameraRelativeMoveDirection()
+    // {
+    //     return mainCamera.forward * input.MoveInput.y + mainCamera.right * input.MoveInput.x;
+    // }
+    private Vector3 GetCameraRelativeMoveDirection()
+    {
+        Vector3 cameraForward = mainCamera.forward;
+        Vector3 cameraRight = mainCamera.right;
+
+        // Remove vertical component
+        cameraForward.y = 0;
+        cameraRight.y = 0;
+
+        // Normalize so diagonal movement isn't faster
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+
+        return cameraForward * input.MoveInput.y +
+            cameraRight * input.MoveInput.x;
+    }
+
+    private void HandleHover()
+    {
+        if (ground.IsGrounded)
+        {
+            float rayDirVelocity = Vector3.Dot(Vector3.down, rb.linearVelocity);
+            float offset = ground.GroundDistance - stats.rideHeight;
+            float springForce = (offset * stats.rideSpringStrength) - (rayDirVelocity * stats.rideSpringDamper);
+            rb.AddForce(Vector3.down * springForce);
+        }
+    }
+
+    // UPDATED: Now takes the pre-calculated moveDir
+    private void HandleMovement(Vector3 moveDir)
+    {
+        moveDir.y = 0;
         Vector3 targetVelocity = moveDir * stats.maxSpeed;
+        
+        Vector3 currentVelocity = rb.linearVelocity;
+        Vector3 currentXZVelocity = new Vector3(currentVelocity.x, 0, currentVelocity.z);
 
-        velocity.x = Mathf.MoveTowards(
-            velocity.x,
-            targetVelocity.x,
-            stats.acceleration * Time.deltaTime
-        );
+        Vector3 velocityDifference = targetVelocity - currentXZVelocity;
 
-        velocity.z = Mathf.MoveTowards(
-            velocity.z,
-            targetVelocity.z,
-            stats.acceleration * Time.deltaTime
-        );
-
-        controller.Move(velocity * Time.deltaTime);
+        rb.AddForce(velocityDifference * stats.acceleration, ForceMode.Acceleration);
     }
 
-    public Vector3 GetVelocity()
+    // UPDATED: Now takes the pre-calculated moveDir
+    private void HandleRotation(Vector3 moveDir)
     {
-        return velocity;
-    }
-
-    public void SetVerticalVelocity(float y)
-    {
-        velocity.y = y;
+        moveDir.y = 0; 
+        transform.LookAt(transform.position + moveDir);
     }
 }

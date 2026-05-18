@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerGravity : MonoBehaviour
 {
-    PlayerLocomotion locomotion;
-    PlayerGroundCheck ground; // 1. Add reference to your ground check
+    PlayerGroundCheck ground;
+    PlayerInputReader input; 
     MovementStats stats;
-
-    float verticalVelocity;
+    Rigidbody rb;
 
     public void Initialize(MovementStats s)
     {
@@ -15,36 +15,24 @@ public class PlayerGravity : MonoBehaviour
 
     void Awake()
     {
-        locomotion = GetComponent<PlayerLocomotion>();
-        ground = GetComponent<PlayerGroundCheck>(); // 2. Get the component
+        ground = GetComponent<PlayerGroundCheck>();
+        input = GetComponent<PlayerInputReader>(); 
+        rb = GetComponent<Rigidbody>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        // 3. Reset gravity if we are on the ground and falling
-        if (ground.IsGrounded && verticalVelocity < 0)
+        float currentYVel = rb.linearVelocity.y;
+        float gravityMultiplier = stats.gravityScaleDrop;
+
+        rb.AddForce(Physics.gravity * gravityMultiplier, ForceMode.Acceleration);
+
+        // Terminal velocity
+        if (rb.linearVelocity.y < stats.jumpTerminalVelocity)
         {
-            // We set it to a small negative number (like -2f) instead of 0.
-            // This forces the CharacterController to constantly press into the floor,
-            // which helps it walk down slopes smoothly and keeps ground detection reliable.
-            verticalVelocity = -2f;
+            Vector3 vel = rb.linearVelocity;
+            vel.y = stats.jumpTerminalVelocity;
+            rb.linearVelocity = vel;
         }
-
-        verticalVelocity += Physics.gravity.y * stats.gravityScaleDrop * Time.deltaTime;
-
-        if (verticalVelocity < stats.jumpTerminalVelocity)
-            verticalVelocity = stats.jumpTerminalVelocity;
-
-        locomotion.SetVerticalVelocity(verticalVelocity);
-    }
-
-    public void SetVelocity(float v)
-    {
-        verticalVelocity = v;
-    }
-
-    public float GetVelocity()
-    {
-        return verticalVelocity;
     }
 }

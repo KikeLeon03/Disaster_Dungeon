@@ -24,11 +24,12 @@ public class PlayerContextActions : MonoBehaviour
     {
         if (!wasGrounded && ground.IsGrounded)
         {
-            float impact = gravity.GetVelocity();
+            float impact = GetComponent<Rigidbody>().linearVelocity.y;
 
             if (impact < stats.landingContextThreshold)
             {
-                UnityEngine.Debug.Log("Hard Landing!");
+                //UnityEngine.Debug.Log("Hard Landing!");
+                ;
             }
         }
 

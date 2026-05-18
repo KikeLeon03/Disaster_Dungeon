@@ -16,16 +16,22 @@ public class MovementStats : ScriptableObject
 
     [Header("Jumping")]
     public float jumpUpVel = 8f;
-    public float jumpUpVelFactorFromExistingY = 1f;
-    public float analogJumpUpForce = 1f;
-    public float jumpTerminalVelocity = -20f;
-    public float jumpDuration = 0.2f;
+    public float jumpBufferTime = 0.2f;           
     public float coyoteTimeThreshold = 0.15f;
-    public float autoJumpAfterLandThreshold = 0.1f;
-    public float jumpFallFactor = 1.5f;
-    public float jumpSkipGroundCheckDuration = 0.05f;
+    public float jumpHoldForce = 25f;
+    public float jumpTerminalVelocity = -20f;
+    public float jumpHoldDuration = 0.15f;
+
+    public float fallGravityMultiplier = 2.5f;
+    public float lowJumpGravityMultiplier = 4f;
+
 
     [Header("Context Actions")]
     public float landingContextThreshold = -10f;
     public float minLandingContextDuration = 0.2f;
+
+    [Header("Hover Physics")]
+    public float rideHeight = 1.2f; // How high you want to float, usually recommend 1 + your_character_hight/2
+    public float rideSpringStrength = 250f; // How stiff the suspension is
+    public float rideSpringDamper = 20f; // Prevents infinite bouncing
 }

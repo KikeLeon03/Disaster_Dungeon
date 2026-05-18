@@ -29,7 +29,7 @@ public class SpherecastSpring : MonoBehaviour
         if (Physics.SphereCast(transform.position, sphereRadius, Vector3.down, out RaycastHit hit, raycastLength, bounceLayer))
         {
             Vector3 desiredPosition = hit.point + (Vector3.up * neutralForceDistance);
-
+            UnityEngine.Debug.DrawLine(transform.position, desiredPosition, Color.green);
             if (!onlyPushAway | (transform.position.y < desiredPosition.y))
             {
                 // 2. ISOLATE Y-AXIS DISPLACEMENT
@@ -43,7 +43,8 @@ public class SpherecastSpring : MonoBehaviour
 
                 // 4. Calculate the Spring Force using your static method
                 Vector3 springForce = SpringPhysics.HookesLaw(displacement, velocity, stiffness, damper);
-
+                
+                UnityEngine.Debug.Log($"Displacement: {displacement.y:F2}, Velocity: {velocity.y:F2}, Spring Force: {springForce.y:F2}");
                 // 5. Apply the force to the Rigidbody (Now strictly vertical)
                 rb.AddForce(springForce);
             }
