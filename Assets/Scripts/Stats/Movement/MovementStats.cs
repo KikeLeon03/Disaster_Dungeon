@@ -30,6 +30,9 @@ public class MovementStats : ScriptableObject
     public float landingContextThreshold = -10f;
     public float minLandingContextDuration = 0.2f;
 
+    [Header("Rotation")]
+    public float rotationSpeed = 10f;
+
     [Header("Hover Physics")]
     public float rideHeight = 1.2f; // How high you want to float, usually recommend 1 + your_character_hight/2
     public float rideSpringStrength = 250f; // How stiff the suspension is

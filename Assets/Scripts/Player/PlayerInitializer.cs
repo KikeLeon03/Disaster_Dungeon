@@ -10,5 +10,6 @@ public class PlayerInitializer : MonoBehaviour
         GetComponent<PlayerGravity>().Initialize(stats);
         GetComponent<PlayerJump>().Initialize(stats);
         GetComponent<PlayerContextActions>().Initialize(stats);
+        GetComponent<PlayerAttack>().Initialize(stats);
     }
 }

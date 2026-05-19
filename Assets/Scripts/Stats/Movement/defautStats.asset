@@ -19,10 +19,10 @@ MonoBehaviour:
   maxAccelerationForceFactorFromDot: 1
   forceScale: 2
   gravityScaleDrop: 11
-  jumpUpVel: 27
+  jumpUpVel: 30
   jumpBufferTime: 0.1
   coyoteTimeThreshold: 0.15
-  jumpHoldForce: 85
+  jumpHoldForce: 100
   jumpTerminalVelocity: -45
   jumpHoldDuration: 0.4
   fallGravityMultiplier: 2.5

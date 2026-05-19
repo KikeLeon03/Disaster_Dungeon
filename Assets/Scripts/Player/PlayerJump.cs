@@ -89,7 +89,8 @@ public class PlayerJump : MonoBehaviour
             // Cancel any downward velocity so jumpUpVel is always a clean baseline,
             // regardless of how fast the player was falling before.
             Vector3 vel = rb.linearVelocity;
-            vel.y = 0f;
+            if(vel.y < 0f)
+                vel.y = 0f;
             rb.linearVelocity = vel;
 
             // VelocityChange ignores mass — jumpUpVel directly becomes the Y velocity.

@@ -8,7 +8,6 @@ public class PlayerLocomotion : MonoBehaviour
     MovementStats stats;
     Rigidbody rb;
 
-    [SerializeField] private float rotationSpeed = 15f; 
     [SerializeField] private bool inverseCameraMovement = false;
     
     // NEW: Reference to the camera so we know which way we are looking
@@ -41,18 +40,8 @@ public class PlayerLocomotion : MonoBehaviour
     void FixedUpdate()
     {
         HandleHover();
-        
-        // Calculate our camera-relative input exactly once per frame
-        Vector3 moveDir = GetCameraRelativeMoveDirection();
-        
-        // Pass it to both methods
-        HandleMovement(moveDir);
-
-        if (!inverseCameraMovement)
-        {
-            moveDir = -moveDir;
-        }
-        //HandleRotation(moveDir); 
+        HandleMovement(GetCameraRelativeMoveDirection());
+        HandleRotation();
     }
 
     // NEW METHOD: Converts raw input into camera-relative direction
@@ -88,7 +77,17 @@ public class PlayerLocomotion : MonoBehaviour
         }
     }
 
-    // UPDATED: Now takes the pre-calculated moveDir
+    private void HandleRotation()
+    {
+        Vector3 cameraFlat = mainCamera.forward;
+        cameraFlat.y = 0f;
+        if (cameraFlat.sqrMagnitude < 0.001f) return;
+
+        Quaternion targetRot = Quaternion.LookRotation(cameraFlat.normalized);
+        rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRot,
+                         1f - Mathf.Exp(-stats.rotationSpeed * Time.fixedDeltaTime)));
+    }
+
     private void HandleMovement(Vector3 moveDir)
     {
         moveDir.y = 0;
@@ -100,12 +99,5 @@ public class PlayerLocomotion : MonoBehaviour
         Vector3 velocityDifference = targetVelocity - currentXZVelocity;
 
         rb.AddForce(velocityDifference * stats.acceleration, ForceMode.Acceleration);
-    }
-
-    // UPDATED: Now takes the pre-calculated moveDir
-    private void HandleRotation(Vector3 moveDir)
-    {
-        moveDir.y = 0; 
-        transform.LookAt(transform.position + moveDir);
     }
 }
